@@ -486,6 +486,7 @@ def main():
           plt.xticks(np.linspace(1, ind, ind), seq)
           plt.plot(np.linspace(1, ind, ind), att_N[i][:ind])
           plt.savefig(outputdir+p+'.png')
+          i=i+1
 
 
 if __name__ == "__main__":
