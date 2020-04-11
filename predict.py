@@ -273,7 +273,7 @@ def process_input_train(seq_file,dir):
             if os.path.exists(inputfile):
                 os.remove(inputfile)
             SeqIO.write(seq_record, inputfile, 'fasta')
-            psiblast_cline = NcbipsiblastCommandline(query=inputfile, db='C:\\Users\\yjm85\\Downloads\\ncbi-blast-2.9.0+-x64-win64.tar\\ncbi-blast-2.9.0+-x64-win64\\db\\swissprot.tar\\swissprot\\swissprot', num_iterations=3,
+            psiblast_cline = NcbipsiblastCommandline(query=inputfile, db='./db/swissprot/swissprot', num_iterations=3,
                                                      evalue=0.001, out_ascii_pssm=pssmfile, num_threads=4)
             stdout, stderr = psiblast_cline()
 
@@ -368,6 +368,8 @@ def main():
     outputdir=args.outputdir
     if not outputdir[len(outputdir) - 1] == "/":
         outputdir = outputdir + "/"
+    if not os.path.exists(outputdir):
+        os.mkdir(outputdir)
     existPSSM=args.existPSSM
     if existPSSM!="":
        if not existPSSM[len(existPSSM) - 1] == "/":
@@ -383,7 +385,7 @@ def main():
     else:
         [test_x, test_mask, test_ids] = endpad(inputfile, existPSSM)
 
-    pred = np.zeros((test_x.shape[0],10))
+    pred_big = np.zeros((test_x.shape[0],10))
     att_matrix_N = np.zeros((8, test_x.shape[0], 1000))
     cross_pred_small = np.zeros((test_x.shape[0], 8, 10, 8))
 
@@ -400,17 +402,18 @@ def main():
     att_N = att_matrix_N.sum(axis=0) / 8
 
     pred_small = cross_pred_small.sum(axis=1) / 8
-    pred_c = pred_small.copy()
+    pred_small_c = pred_small.copy()
+    pred_big_c=pred_small_c.max(axis=-1)
 
     pred_small[pred_small >= 0.5] = 1.0
     pred_small[pred_small < 0.5] = 0.0
 
     for i in range(pred_small.shape[0]):
-        index = pred_c[i].max(axis=-1).argmax()
-        pred[i][index]=1.0
+        index = pred_small_c[i].max(axis=-1).argmax()
+        pred_big[i][index]=1.0
         if pred_small[i].sum() == 0:
-            index = pred_c[i].max(axis=-1).argmax()
-            index2 = pred_c[i][index].argmax()
+            index = pred_small_c[i].max(axis=-1).argmax()
+            index2 = pred_small_c[i][index].argmax()
             pred_small[i][index, index2] = 1.0
 
     #sub-cellular results
@@ -420,8 +423,8 @@ def main():
         f1.write(">" + i + ":\t")
         ans = ""
         for j in range(10):
-            f1.write(name[j] + ":" + str(pred_c[ind, j]) + "\t")
-            if pred[ind, j] == 1.0:
+            f1.write(name[j] + ":" + str(pred_big_c[ind, j]) + "\t")
+            if pred_big[ind, j] == 1.0:
                 if j == 0:
                     ans = ans + "Nucleus|"
                 elif j == 1:
@@ -456,7 +459,7 @@ def main():
             for z in range(8):
                 key = float(str(j) + "." + str(z))
                 if key in map_lv2:
-                    f1.write(map_lv2[key] + ":" + str(pred_c[ind, j, z]) + "\t")
+                    f1.write(map_lv2[key] + ":" + str(pred_small_c[ind, j, z]) + "\t")
                     if pred_small[ind, j, z] == 1.0:
                         ans = ans + map_lv2[key] + "|"
         f1.write("prediction:" + ans + "\n")
