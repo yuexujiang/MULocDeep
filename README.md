@@ -1,5 +1,5 @@
 # MULocDeep
-MULocDeep is a deep learning model for protein localization prediction at both sub-cellular level and sub-organellar level. It also has the ability to interpret localization mechanim at a amino acid resolution. Users can go to our webserver at xxx.xxx. This repository is for running MuLocDeep locally.
+MULocDeep is a deep learning model for protein localization prediction at both sub-cellular level and sub-organellar level. It also has the ability to interpret localization mechanism at a amino acid resolution. Users can go to our webserver at xxx.xxx for localiztion prediction and visualization. This repository is for running MuLocDeep locally.
 ## Installation
 
   - Installation has been tested in Windows, Linux and Mac OS X with Python 3.7.4. 
@@ -14,39 +14,18 @@ CPU is only suitable for prediction not training.
 ## Usage:
 ### Predict protein localization
 Predicting protein localization using the pretrained model is fairly simple. There are several parameters that need to be specified by users. They are explained as below:
-  - --input: 
-To train a model, users should have .fasta file for protein sequences and domain boundary annotations on corresponding protein sequences.
-Please refer to the sample_data_seq.txt and sample_data_label.txt as examples. Then use the "dataprocess.pl" to transformat the data. (run "perl dataprocess.pl -h" to see the helps) After that, the processed data can be used as input for "train.py" to train a model (run "python train.py -h" to see the helps). Note: the requirement of packages that imported in the code need to be met. 
-#### Examples (using our provided example data): 
+  - --input filename: The sequences of the proteins that users want to predict. Should be in fasta format.
+  - --output dirname: The name of the folder where the output would be saved.
+  - --existPSSM dirname: This is optional. If the pssm of the protein sequences are already calculated, users can specify the path to that folder. This will save a lot of time, since calculating pssm is time consuming. Otherwise, the prediction program will automaticlly start to generate the pssm for the prediction.
+  - --att: Add this if users want to see the attention visualization. It is for interpreting the localization mechanism. Amino acids with high attention weights are considered related to the sorting signal.
+  - --no-att: Add this, no attention visualization figure.
+
+#### Example (using our provided example data): 
  
 ```sh
-perl dataprocess.pl -input_seq sample_data_seq.txt -input_label sample_data_label.txt -output_seq processed_seq.txt -output_label processed_label.txt
-
-python train.py -seqfil processed_seq.txt -labelfile processed_label.txt -model-prefix custom_model.h5
+python predict.py -input ./wiki_seq.txt -output ./test --att
 ```
 
-custom_model.h5 is the model generated, users can use this file to predict and can also use our pre-trained model that mentioned in our paper. The pre-trained model was saved in file "foldmodel_bilstmwrapper_4sum200_80_40nr_sliwin.h5".
-
-## 2. Predict
-
-To predict domain boundary for protein sequences, firstly, users need to transformat the .fasta sequence using "dataprocess.pl" (run "perl dataprocess.pl -h" to see the helps) and using "predict.py" to predict for protein sequences (run "python predict.py -h" to see the helps). Either users' own model or the model we provided can be used for prediction.
-#### Examples (using our provided example data):
-For GPU users, predict.py will use our pre-trained GPU model "foldmodel_bilstmwrapper_4sum200_80_40nr_sliwin.h5":
-```sh
-perl dataprocess.pl -input_seq sample_data_seq.txt -output_seq processed_seq.txt
-
-python predict.py -input processed_seq.txt -output predict_result.txt
-```
-For CPU users, be sure to add -model-prefix cpu_model.h5 when call predict.py:
-```sh
-perl dataprocess.pl -input_seq sample_data_seq.txt -output_seq processed_seq.txt
-
-python predict.py -input processed_seq.txt -output predict_result.txt -model-prefix cpu_model.h5
-```
-Or users can use the custom model trained (as shown in 1) by their own data to predict.
- ```sh
-python predict.py -input processed_seq.txt -output predict_result.txt -model-prefix custom_model.h5
-```
-
-========================================================================================================================================
-#### If you find the codes or our method is useful, please cite our paper "DeepDom: Predicting protein domain boundary from sequence alone using stacked bidirectional LSTM".
+## Contacts
+If you ever have any question or problem using our tool, please contact us.
+  - Email: yjm85@mail.missouri.edu
