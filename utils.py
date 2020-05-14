@@ -13,6 +13,7 @@ from hier_attention_mask import Attention
 from keras import backend as K
 from Bio.Blast.Applications import NcbipsiblastCommandline
 from Bio import SeqIO
+import sys
 
 def convertSampleToPhysicsVector_pca(seq):
     """
@@ -274,6 +275,30 @@ def process_input_train(seq_file,dir):
             psiblast_cline = NcbipsiblastCommandline(query=inputfile, db='./db/swissprot/swissprot', num_iterations=3,
                                                      evalue=0.001, out_ascii_pssm=pssmfile, num_threads=4)
             stdout, stderr = psiblast_cline()
+
+def process_input_user(seq_file,dir):
+    processed_num=0
+    if not os.path.exists(dir):
+        os.mkdir(dir)
+    index=0
+    for seq_record in list(SeqIO.parse(seq_file, "fasta")):
+        processed_num+=1
+        print("in loop, processing"+str(processed_num)+"\n")
+        pssmfile=dir+str(index)+"_pssm.txt"
+        inputfile=dir+'tempseq.fasta'
+        seql = len(seq_record)
+        if not os.path.exists(pssmfile):
+            if os.path.exists(inputfile):
+                os.remove(inputfile)
+            SeqIO.write(seq_record, inputfile, 'fasta')
+            try:
+              psiblast_cline = NcbipsiblastCommandline(query=inputfile, db='./db/swissprot/swissprot', num_iterations=3,
+                                                     evalue=0.001, out_ascii_pssm=pssmfile, num_threads=4)
+              stdout, stderr = psiblast_cline()
+            except:
+              print("invalid protein: "+seq_record)
+
+        index=index+1
 
 def var_model(train_x):
     [dim_lstm, da, r, W_regularizer, Att_regularizer_weight, drop_per, drop_hid, lr] = [

@@ -25,8 +25,10 @@ def endpad(seqfile, pssmdir):
         ids=[]
         f = open(seqfile, "r")
         line = f.readline()
+        index=0
         while line != '':
-            pssmfile = pssmdir + line[1:].strip() + "_pssm.txt"
+            #pssmfile = pssmdir + line[1:].strip() + "_pssm.txt"
+            pssmfile = pssmdir + str(index) + "_pssm.txt"
             print("doing " + pssmfile + "\n")
             if os.path.exists(pssmfile):
                 id = line.strip()[1:]
@@ -67,6 +69,7 @@ def endpad(seqfile, pssmdir):
                     new_pssms.append(pssm)
                     mask_seq.append(gen_mask_mat(1000, 0))
             line = f.readline()
+            index=index+1
         x = np.array(new_pssms)
         mask = np.array(mask_seq)
         return [x, mask,ids]
@@ -128,7 +131,7 @@ def main():
         pssmdir=outputdir+str(ts)+"_pssm/"
         if not os.path.exists(pssmdir):
           os.makedirs(pssmdir)
-        process_input_train(inputfile,pssmdir)  # generate pssm
+        process_input_user(inputfile,pssmdir)  # generate pssm
         [test_x, test_mask, test_ids] = endpad(inputfile, pssmdir)
     else:
         [test_x, test_mask, test_ids] = endpad(inputfile, existPSSM)
