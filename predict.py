@@ -220,10 +220,20 @@ def main():
     # output attention weights
     f1 = open(outputdir+"attention_weights.txt", "w")
     ind=0
+    f = open(inputfile)
+    list_seq = f.readlines()
     for i in test_ids:
         end = int(test_mask[ind].sum())
+        j = ind * 2 + 1
+        seq = list(list_seq[j].strip())
         f1.write(">" + i + "\n")
-        for p in att_N[ind][0:end]:
+        if len(seq) <= 1000:
+          for p in att_N[ind][0:end]:
+            f1.write(str(p) + " ")
+        else:
+          dif = len(seq) - end
+          w = np.concatenate((att_N[ind][0:500], np.zeros(dif), att_N[ind][500:]), axis=0)
+          for p in w:
             f1.write(str(p) + " ")
         f1.write("\n")
         ind=ind+1
@@ -231,14 +241,19 @@ def main():
 
     if att_draw:
         i = 0
+        f = open(inputfile)
+        list_seq = f.readlines()
         for p in test_ids:
           j = i * 2 + 1
           ind = int(test_mask[i].sum())
-          f = open(inputfile)
-          list_seq = f.readlines()
-          seq = list(list_seq[j].strip())[:ind]
-          plt.xticks(np.linspace(1, ind, ind), seq)
-          plt.plot(np.linspace(1, ind, ind), att_N[i][:ind])
+          seq = list(list_seq[j].strip())
+          plt.xticks(np.linspace(1, len(seq), len(seq)), seq)
+          if len(seq)<=1000:
+            plt.plot(np.linspace(1, ind, ind), att_N[i][:ind])
+          else:
+            dif=len(seq)-ind
+            w=np.concatenate((att_N[i][0:500],np.zeros(dif),att_N[i][500:]),axis=0)
+            plt.plot(np.linspace(1, len(seq), len(seq)),w)
           plt.savefig(outputdir+p+'.png')
           i=i+1
 
