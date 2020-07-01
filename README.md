@@ -5,7 +5,7 @@ MULocDeep is a deep learning model for protein localization prediction at both s
   - Installation has been tested in Windows, Linux and Mac OS X with Python 3.7.4. 
   - Keras version: 2.3.0
   - For predicting, GPU is not required. For training a new model, the Tensorflow-gpu version we tested is: 1.13.1
-  - Users need to install the NCBI Blast+ for the PSSM. The download link is https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/. The version we tested is 2.9.0. The database is already in the 'db' folder.
+  - Users need to install the NCBI Blast+ for the PSSM. The download link is https://ftp.ncbi.nlm.nih.gov/blast/executables/blast+/. The version we tested is 2.9.0. The database can be downloaed at https://drive.google.com/drive/folders/19gbmtZAz1kyR76YS-cvXSJAzWJdSJniq?usp=sharing. Put the downloaded 'db' folder in the same folder as other files in this project.
 
 ## Running on GPU or CPU
 
