@@ -1,0 +1,10 @@
+Nucleus;0.0
+Cytoplasm;1.0
+Extracellular;2.0
+Mitochondrion;3.0
+Cell.membrane;4.0
+Endoplasmic.reticulum;5.0
+Plastid;6.0
+Golgi.apparatus;7.0
+Lysosome/Vacuole;8.0
+Peroxisome;9.0
