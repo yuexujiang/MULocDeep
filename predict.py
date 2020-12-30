@@ -151,19 +151,29 @@ def main():
     pred_small = cross_pred_small.sum(axis=1) / 8 #[?,10,8]
     pred_small_c = pred_small.copy()
     pred_big_c=pred_small_c.max(axis=-1)   #[?, 10]
-
-    pred_small[pred_small >= 0.5] = 1.0
-    pred_small[pred_small < 0.5] = 0.0
-
+    
+    cutoff = np.array([[0.5, 0.5, 0.5, 0.3, 0.5, 0.4, 0.3, 0.5],
+                      [0.5, 0.5, 0.5, 0.5, 0.4, 0.4, 0.5, 0.3],
+                      [1, 0.5, 1, 1, 1, 1, 1, 1],
+                      [0.5, 0.5, 0.5, 0.5, 0.5, 1, 1, 1],
+                      [0.5, 0.1, 0.4, 0.4, 0.4, 0.3, 1, 1],
+                      [0.4, 0.5, 0.5, 0.5, 0.4, 1, 1, 1],
+                      [0.5, 0.5, 0.5, 0.1, 0.5, 1, 1, 1],
+                      [0.1, 0.1, 0.5, 0.3, 1, 1, 1, 1],
+                      [0.3, 1, 1, 1, 1, 1, 1, 1],
+                      [0.4, 1, 1, 1, 1, 1, 1, 1]])
+        
+    pred_small[pred_small >= cutoff]=1.0
+    pred_small[pred_small < cutoff] =0.0
     for i in range(pred_small.shape[0]):
-        index = pred_small_c[i].max(axis=-1).argmax()
-        pred_big[i][index]=1.0
-        pred_big[i][pred_small_c[i].max(axis=-1)>=0.5]=1.0
+        index=((pred_small_c[i]>=cutoff).sum(axis=-1))>0
+        pred_big[i][index] =1.0
         if pred_small[i].sum() == 0:
             index = pred_small_c[i].max(axis=-1).argmax()
             index2 = pred_small_c[i][index].argmax()
             pred_small[i][index, index2] = 1.0
-
+            pred_big[i][index] = 1.0
+                
     #sub-cellular results
     f1 = open(outputdir+"sub_cellular_prediction.txt", "w")
     ind = 0
