@@ -212,7 +212,7 @@ def singlemodel(train_x):
     mask_input.append(l_indrop)
     mask_input.append(input_mask)
     mask_layer1 = Lambda(mask_func)(mask_input)
-    x1 = layers.Bidirectional(LSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
+    x1 = layers.Bidirectional(CuDNNLSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
                                         return_sequences=True), merge_mode='sum')(mask_layer1)  # [?,seq_len,dim_lstm]
     x1bn = layers.BatchNormalization()(x1)
     x1d = layers.Dropout(drop_hid)(x1bn)
@@ -220,7 +220,7 @@ def singlemodel(train_x):
     mask_input.append(x1d)
     mask_input.append(input_mask)
     mask_layer2 = Lambda(mask_func)(mask_input)
-    x2 = layers.Bidirectional(LSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
+    x2 = layers.Bidirectional(CuDNNLSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
                                         return_sequences=True), merge_mode='sum')(mask_layer2)  # [?,seq_len,dim_lstm]
     x2bn = layers.BatchNormalization()(x2)
     x2d = layers.Dropout(drop_hid)(x2bn)
@@ -310,7 +310,7 @@ def var_model(train_x):
     mask_input.append(l_indrop)
     mask_input.append(input_mask)
     mask_layer1 = Lambda(mask_func)(mask_input)
-    x1 = layers.Bidirectional(LSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
+    x1 = layers.Bidirectional(CuDNNLSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
                                        return_sequences=True), merge_mode='sum')(mask_layer1)  # [?,seq_len,dim_lstm]
     x1bn = layers.BatchNormalization()(x1)
     x1d = layers.Dropout(drop_hid)(x1bn)
@@ -318,7 +318,7 @@ def var_model(train_x):
     mask_input.append(x1d)
     mask_input.append(input_mask)
     mask_layer2 = Lambda(mask_func)(mask_input)
-    x2 = layers.Bidirectional(LSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
+    x2 = layers.Bidirectional(CuDNNLSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
                                        return_sequences=True), merge_mode='sum')(mask_layer2)  # [?,seq_len,dim_lstm]
     x2bn = layers.BatchNormalization()(x2)
     x2d = layers.Dropout(drop_hid)(x2bn)
