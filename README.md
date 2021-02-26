@@ -10,7 +10,7 @@ MULocDeep is a deep learning model for protein localization prediction at both s
 ## Running on GPU or CPU
 
 If you want to use GPU, you also need to install [CUDA]( https://developer.nvidia.com/cuda-toolkit) and [cuDNN](https://developer.nvidia.com/cudnn); refer to their websites for instructions.
-CPU prediction version will be released soon. 
+ 
 ## Usage:
 ### Predict protein localization
 Predicting protein localization using the pretrained model is fairly simple. There are several parameters that need to be specified by users. They are explained as below:
@@ -30,6 +30,10 @@ For CPU usage:
 ```sh
 python cpu/cpu_predict.py -input ./wiki_seq.txt -output ./test --att
 ```
+
+#### Note
+The GPU model is trained using CuDNNLSTM, while the CPU model is trained using LSTM. So, the prediction results are slightly different between the two models. The results shown in the MULocDeep paper were obtained using the GPU model.
+
 ## Contacts
 If you ever have any question or problem using our tool, please contact us.
   - Email: yjm85@mail.missouri.edu
