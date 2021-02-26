@@ -21,11 +21,15 @@ Predicting protein localization using the pretrained model is fairly simple. The
   - --no-att: Add this, no attention visualization figure.
 
 #### Example (using our provided example data): 
- 
+
+For GPU usage:
 ```sh
 python predict.py -input ./wiki_seq.txt -output ./test --att
 ```
-
+For CPU usage:
+```sh
+python cpu/cpu_predict.py -input ./wiki_seq.txt -output ./test --att
+```
 ## Contacts
 If you ever have any question or problem using our tool, please contact us.
   - Email: yjm85@mail.missouri.edu
