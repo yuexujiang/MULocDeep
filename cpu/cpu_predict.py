@@ -146,12 +146,8 @@ def main():
 
     for foldnum in range(8):
         model_big, model_small = singlemodel(test_x)
-        # model_big.load_weights('./cpu_models/fold' + str(foldnum) + '_big_lv1_acc-weights.hdf5')
-        # cross_pred[:, foldnum] = model_big.predict([test_x, test_mask.reshape(-1, 1000, 1)])
         model_small.load_weights(
-            './review_2ndRound_6/models/cpu_model/fold' + str(foldnum) + '_big_lv1_acc-weights.hdf5')
-        # model_small.load_weights(
-        #     './review_2ndRound_5/models/gpu_model/fold' + str(foldnum) + '_small_lv2_acc-weights.hdf5')
+            './cpu_model/fold' + str(foldnum) + '_big_lv1_acc-weights.hdf5')
 
         cross_pred_small[:, foldnum] = model_small.predict([test_x, test_mask.reshape(-1, 1000, 1)])[0]
         model_att = Model(inputs=model_big.inputs, outputs=model_big.layers[-11].output[1])
