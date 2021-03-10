@@ -12,6 +12,15 @@ MULocDeep is a deep learning model for protein localization prediction at both s
 If you want to use GPU, you also need to install [CUDA]( https://developer.nvidia.com/cuda-toolkit) and [cuDNN](https://developer.nvidia.com/cudnn); refer to their websites for instructions.
  
 ## Usage:
+### Train a model
+To train a MULocDeep model:
+```sh
+python train.py --lv1_input_dir ./data/UniLoc-train-20nr/8folds/ --lv2_input_dir ./data/UniLoc-train-20nr/8folds/ --model_output ./model_xxx/ --MULocDeep_model
+```
+To train a variant model (eg. using deeploc training data to train a 10-class classification model):
+```sh
+python train.py --input_dir ./data/deeploc_40nr_8folds/ --model_output ./var_model_xxx/
+```
 ### Predict protein localization
 Predicting protein localization using the pretrained model is fairly simple. There are several parameters that need to be specified by users. They are explained as below:
   - --input filename: The sequences of the proteins that users want to predict. Should be in fasta format.
