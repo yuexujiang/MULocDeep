@@ -147,12 +147,14 @@ def train_MULocDeep(lv1_dir,lv2_dir,pssm_dir,output_dir,foldnum):
 
 def train_var(input_var,pssm_dir,output_dir,foldnum):
     # get small data
-    [train_x,train_y,train_mask]=endpad(input_var+"deeploc_40nr_train_fold"+str(foldnum)+"_seq",
+    [train_x,train_y,train_mask,train_ids]=endpad(input_var+"deeploc_40nr_train_fold"+str(foldnum)+"_seq",
                                         input_var+"deeploc_40nr_train_fold"+str(foldnum)+"_label",
-                                        pssm_dir)
-    [val_x,val_y,val_mask]=endpad(input_var+"deeploc_40nr_val_fold"+str(foldnum)+"_seq",
+                                        pssm_dir,
+                                        "./data/npzfiles/train_fold"+str(foldnum)+"_seq.npz")
+    [val_x,val_y,val_mask,val_ids]=endpad(input_var+"deeploc_40nr_val_fold"+str(foldnum)+"_seq",
                                   input_var+"deeploc_40nr_val_fold"+str(foldnum)+"_label",
-                                  pssm_dir)
+                                  pssm_dir,
+                                  "./data/npzfiles/val_fold"+str(foldnum)+"_seq.npz")
     batch_size = 128
     print("doing " + str(foldnum) + "th fold")
     model = var_model(train_x)
