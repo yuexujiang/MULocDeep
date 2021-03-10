@@ -262,6 +262,8 @@ def main():
             w=np.concatenate((att_N[i][0:500],np.zeros(dif),att_N[i][500:]),axis=0)
             plt.plot(np.linspace(1, len(seq), len(seq)),w)
           plt.savefig(outputdir+p+'.png')
+          plt.clf()
+          plt.cla()
           i=i+1
 
 
