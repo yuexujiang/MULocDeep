@@ -20,57 +20,54 @@ from utils import *
 
 
 
+
+def process_eachseq(seq,pssmfile,mask_seq,new_pssms):
+    seql = len(seq)
+    if os.path.exists(pssmfile):
+        print("found " + pssmfile + "\n")
+        pssm = readPSSM(pssmfile)
+    else:
+        print("using Blosum62\n")
+        pssm = convertSampleToBlosum62(seq)
+    pssm = pssm.astype(float)
+    PhyChem = convertSampleToPhysicsVector_pca(seq)
+    pssm = np.concatenate((PhyChem, pssm), axis=1)
+    print(id)
+    if seql <= 1000:
+        padnum = 1000 - seql
+        padmatrix = np.zeros([padnum, 25])
+        pssm = np.concatenate((pssm, padmatrix), axis=0)
+        new_pssms.append(pssm)
+        mask_seq.append(gen_mask_mat(seql, padnum))
+    else:
+        pssm = np.concatenate((pssm[0:500, :], pssm[seql - 500:seql, :]), axis=0)
+        new_pssms.append(pssm)
+        mask_seq.append(gen_mask_mat(1000, 0))
+    
+
+
 def endpad(seqfile, pssmdir):
         new_pssms = []
         mask_seq = []
         ids=[]
         f = open(seqfile, "r")
-        line = f.readline()
         index=0
-        while line != '':
+        for line in f:
             pssmfile = pssmdir + str(index) + "_pssm.txt"
-            if os.path.exists(pssmfile):
-                print("found " + pssmfile + "\n")
+            if ">" in line:
+                if index!=0:
+                   ids.append(id)
+                   process_eachseq(seq,pssmfile,mask_seq,new_pssms)
+                
+                seq=''
                 id = line.strip()[1:]
-                ids.append(id)
-                seq = f.readline().strip()
-                seql = len(seq)
-                pssm = readPSSM(pssmfile)
-                pssm = pssm.astype(float)
-                PhyChem = convertSampleToPhysicsVector_pca(seq)
-                pssm = np.concatenate((PhyChem, pssm), axis=1)
-                if seql <= 1000:
-                    padnum = 1000 - seql
-                    padmatrix = np.zeros([padnum, 25])
-                    pssm = np.concatenate((pssm, padmatrix), axis=0)
-                    new_pssms.append(pssm)
-                    mask_seq.append(gen_mask_mat(seql, padnum))
-                else:
-                    pssm = np.concatenate((pssm[0:500, :], pssm[seql - 500:seql, :]), axis=0)
-                    new_pssms.append(pssm)
-                    mask_seq.append(gen_mask_mat(1000, 0))
             else:
-                print("using Blosum62\n")
-                id = line.strip()[1:]
-                ids.append(id)
-                seq = f.readline().strip()
-                seql = len(seq)
-                pssm = convertSampleToBlosum62(seq)
-                pssm = pssm.astype(float)
-                PhyChem = convertSampleToPhysicsVector_pca(seq)
-                pssm = np.concatenate((PhyChem, pssm), axis=1)
-                if seql <= 1000:
-                    padnum = 1000 - seql
-                    padmatrix = np.zeros([padnum, 25])
-                    pssm = np.concatenate((pssm, padmatrix), axis=0)
-                    new_pssms.append(pssm)
-                    mask_seq.append(gen_mask_mat(seql, padnum))
-                else:
-                    pssm = np.concatenate((pssm[0:500, :], pssm[seql - 500:seql, :]), axis=0)
-                    new_pssms.append(pssm)
-                    mask_seq.append(gen_mask_mat(1000, 0))
-            line = f.readline()
-            index=index+1
+               seq+=line.strip()
+            
+            index+=1
+        
+        ids.append(id)
+        process_eachseq(seq,pssmfile,mask_seq,new_pssms)
         x = np.array(new_pssms)
         mask = np.array(mask_seq)
         return [x, mask,ids]
@@ -228,10 +225,23 @@ def main():
     f1 = open(outputdir+"attention_weights.txt", "w")
     ind=0
     f = open(inputfile)
-    list_seq = f.readlines()
+    list_seq = []
+    seqindex=0
+    for line in f:
+        if ">" in line:
+            if seqindex!=0:
+               list_seq.append(seq)
+            
+            seq=''
+        else:
+            seq+=line.strip()
+        
+        seqindex+=1
+    
+    list_seq.append(seq)
     for i in test_ids:
         end = int(test_mask[ind].sum())
-        j = ind * 2 + 1
+        j = ind 
         seq = list(list_seq[j].strip())
         f1.write(">" + i + "\n")
         if len(seq) <= 1000:
@@ -245,15 +255,14 @@ def main():
         f1.write("\n")
         ind=ind+1
     f1.close()
-
+    
     if att_draw:
         i = 0
-        f = open(inputfile)
-        list_seq = f.readlines()
         for p in test_ids:
-          j = i * 2 + 1
           ind = int(test_mask[i].sum())
-          seq = list(list_seq[j].strip())
+          seq = list(list_seq[i].strip())
+          plt.clf()
+          plt.cla()
           plt.xticks(np.linspace(1, len(seq), len(seq)), seq)
           if len(seq)<=1000:
             plt.plot(np.linspace(1, ind, ind), att_N[i][:ind])
@@ -262,8 +271,6 @@ def main():
             w=np.concatenate((att_N[i][0:500],np.zeros(dif),att_N[i][500:]),axis=0)
             plt.plot(np.linspace(1, len(seq), len(seq)),w)
           plt.savefig(outputdir+p+'.png')
-          plt.clf()
-          plt.cla()
           i=i+1
 
 

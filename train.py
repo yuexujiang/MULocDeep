@@ -10,6 +10,29 @@ from utils import *
 import calendar
 import time
 
+def process_eachseq(seq,pssmfile,mask_seq,new_pssms):
+    seql = len(seq)
+    if os.path.exists(pssmfile):
+        print("found " + pssmfile + "\n")
+        pssm = readPSSM(pssmfile)
+    else:
+        print("using Blosum62\n")
+        pssm = convertSampleToBlosum62(seq)
+    pssm = pssm.astype(float)
+    PhyChem = convertSampleToPhysicsVector_pca(seq)
+    pssm = np.concatenate((PhyChem, pssm), axis=1)
+    print(id)
+    if seql <= 1000:
+        padnum = 1000 - seql
+        padmatrix = np.zeros([padnum, 25])
+        pssm = np.concatenate((pssm, padmatrix), axis=0)
+        new_pssms.append(pssm)
+        mask_seq.append(gen_mask_mat(seql, padnum))
+    else:
+        pssm = np.concatenate((pssm[0:500, :], pssm[seql - 500:seql, :]), axis=0)
+        new_pssms.append(pssm)
+        mask_seq.append(gen_mask_mat(1000, 0))
+    
 
 def endpad(seqfile, labelfile, pssmdir="", npzfile = ""):
     if not os.path.exists(npzfile):
@@ -19,37 +42,27 @@ def endpad(seqfile, labelfile, pssmdir="", npzfile = ""):
         ids=[]
         f = open(seqfile, "r")
         f2 = open(labelfile, "r")
-        line = f.readline()
-        while line != '':
+        index=0
+        for line in f:
             pssmfile = pssmdir + line[1:].strip() + "_pssm.txt"
-            if line[0] == '>':
-                label = f2.readline().strip()
-            id = line.strip()[1:]
-            ids.append(id)
-            labels.append(label)
-            seq = f.readline().strip()
-            seql = len(seq)
-            if os.path.exists(pssmfile):
-                print("found " + pssmfile + "\n")
-                pssm = readPSSM(pssmfile)
+            if ">"in line:
+                 if index!=0:
+                   label = f2.readline().strip()
+                   labels.append(label)
+                   ids.append(id)
+                   process_eachseq(seq,pssmfile,mask_seq,new_pssms)
+                 
+                 seq=''
+                 id = line.strip()[1:]
             else:
-                print("using Blosum62\n")
-                pssm = convertSampleToBlosum62(seq)
-            pssm = pssm.astype(float)
-            PhyChem = convertSampleToPhysicsVector_pca(seq)
-            pssm = np.concatenate((PhyChem, pssm), axis=1)
-            print(id)
-            if seql <= 1000:
-                padnum = 1000 - seql
-                padmatrix = np.zeros([padnum, 25])
-                pssm = np.concatenate((pssm, padmatrix), axis=0)
-                new_pssms.append(pssm)
-                mask_seq.append(gen_mask_mat(seql, padnum))
-            else:
-                pssm = np.concatenate((pssm[0:500, :], pssm[seql - 500:seql, :]), axis=0)
-                new_pssms.append(pssm)
-                mask_seq.append(gen_mask_mat(1000, 0))
-            line = f.readline()
+               seq+=line.strip()
+            
+            index+=1
+        
+        label = f2.readline().strip()
+        labels.append(label)
+        ids.append(id)
+        process_eachseq(seq,pssmfile,mask_seq,new_pssms)
         x = np.array(new_pssms)
         y = [convertlabels_to_categorical(i) for i in labels]
         y = np.array(y)
