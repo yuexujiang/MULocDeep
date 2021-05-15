@@ -136,7 +136,7 @@ def main():
 
     for foldnum in range(8):
         model_big, model_small = singlemodel(test_x)
-        model_small.load_weights('./gpu_model/fold' + str(foldnum) + '_big_lv1_acc-weights.hdf5')
+        model_small.load_weights('./gpu_model_40nr/fold' + str(foldnum) + '_big_lv1_acc-weights.hdf5')
         
         cross_pred_small[:, foldnum]= model_small.predict([test_x, test_mask.reshape(-1, 1000, 1)])[0]
         model_att = Model(inputs=model_big.inputs, outputs=model_big.layers[-11].output[1])
@@ -149,17 +149,17 @@ def main():
     pred_small_c = pred_small.copy()
     pred_big_c=pred_small_c.max(axis=-1)   #[?, 10]
     
-    cutoff = np.array([[0.5, 0.5, 0.5, 0.3, 0.5, 0.4, 0.3, 0.5],
-                      [0.5, 0.5, 0.5, 0.5, 0.4, 0.4, 0.5, 0.3],
+    cutoff = np.array([[0.5, 0.2, 0.5, 0.3, 0.5, 0.4, 0.4, 0.5],
+                      [0.3, 0.5, 0.3, 0.1, 0.5, 0.3, 0.5, 0.2],
                       [1, 0.5, 1, 1, 1, 1, 1, 1],
-                      [0.5, 0.5, 0.5, 0.5, 0.5, 1, 1, 1],
-                      [0.5, 0.1, 0.4, 0.4, 0.4, 0.3, 1, 1],
-                      [0.4, 0.5, 0.5, 0.5, 0.4, 1, 1, 1],
-                      [0.5, 0.5, 0.5, 0.1, 0.5, 1, 1, 1],
-                      [0.1, 0.1, 0.5, 0.3, 1, 1, 1, 1],
-                      [0.3, 1, 1, 1, 1, 1, 1, 1],
-                      [0.4, 1, 1, 1, 1, 1, 1, 1]])
-        
+                      [0.5, 0.1, 0.5, 0.4, 0.4, 1, 1, 1],
+                      [0.5, 0.1, 0.5, 0.1, 0.5, 0.1, 1, 1],
+                      [0.4, 0.5, 0.5, 0.2, 0.1, 1, 1, 1],
+                      [0.2, 0.3, 0.1, 0.3, 0.3, 1, 1, 1],
+                      [0.2, 0.3, 0.1, 0.1, 1, 1, 1, 1],
+                      [0.1, 1, 1, 1, 1, 1, 1, 1],
+                      [0.3, 1, 1, 1, 1, 1, 1, 1]])
+    
     pred_small[pred_small >= cutoff]=1.0
     pred_small[pred_small < cutoff] =0.0
     for i in range(pred_small.shape[0]):
