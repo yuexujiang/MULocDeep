@@ -82,25 +82,25 @@ def train_MULocDeep(lv1_dir,lv2_dir,pssm_dir,output_dir,foldnum):
     # get small data
     [train_x, train_y, train_mask, train_ids] = endpad(
         lv2_dir+"lv2_train_fold" + str(foldnum) + "_seq",
-        lv2_dir+"lv2_train_fold" + str(foldnum) + "_label",
+        lv2_dir+"lv2_train_fold" + str(foldnum) + "_lab",
         pssm_dir,
         "./data/npzfiles/lv2_train_fold"+str(foldnum)+"_seq.npz")
     [val_x, val_y, val_mask,val_ids] = endpad(
         lv2_dir+"lv2_val_fold" + str(foldnum) + "_seq",
-        lv2_dir+"lv2_val_fold" + str(foldnum) + "_label",
+        lv2_dir+"lv2_val_fold" + str(foldnum) + "_lab",
         pssm_dir,
         "./data/npzfiles/lv2_val_fold"+str(foldnum)+"_seq.npz")
 
     # get big data
     [train_x_big, train_y_big, train_mask_big, train_ids_big] = endpad(
         lv1_dir + "lv1_train_fold" + str(foldnum) + "_seq",
-        lv1_dir + "lv1_train_fold" + str(foldnum) + "_label",
+        lv1_dir + "lv1_train_fold" + str(foldnum) + "_lab",
         pssm_dir,
         "./data/npzfiles/lv1_train_fold" + str(foldnum) + "_seq.npz")
 
     [val_x_big, val_y_big, val_mask_big, val_ids_big] = endpad(
         lv1_dir + "lv1_val_fold" + str(foldnum) + "_seq",
-        lv1_dir + "lv1_val_fold" + str(foldnum) + "_label",
+        lv1_dir + "lv1_val_fold" + str(foldnum) + "_lab",
         pssm_dir,
         "./data/npzfiles/lv1_val_fold" + str(foldnum) + "_seq.npz")
 
