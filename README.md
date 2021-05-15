@@ -13,7 +13,7 @@ If you want to use GPU, you also need to install [CUDA]( https://developer.nvidi
  
 ## Usage:
 ### Train a model
-To train a MULocDeep model:
+To train a MULocDeep model: (Here we use the non-redundant training data, since the entire training data is too big to upload to Github)
 ```sh
 python train.py --lv1_input_dir ./data/UniLoc_train_40nr/ --lv2_input_dir ./data/UniLoc_train_40nr/ --model_output ./model_xxx/ --MULocDeep_model
 ```
