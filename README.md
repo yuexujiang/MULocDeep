@@ -15,7 +15,7 @@ If you want to use GPU, you also need to install [CUDA]( https://developer.nvidi
 ### Train a model
 To train a MULocDeep model:
 ```sh
-python train.py --lv1_input_dir ./data/UniLoc-train-20nr/8folds/ --lv2_input_dir ./data/UniLoc-train-20nr/8folds/ --model_output ./model_xxx/ --MULocDeep_model
+python train.py --lv1_input_dir ./data/UniLoc_train_40nr/ --lv2_input_dir ./data/UniLoc_train_40nr/ --model_output ./model_xxx/ --MULocDeep_model
 ```
 To train a variant model (eg. using deeploc training data to train a 10-class classification model):
 ```sh
@@ -36,9 +36,7 @@ For GPU usage:
 python predict.py -input ./wiki_seq.txt -output ./test --att
 ```
 For CPU usage:
-```sh
-python cpu/cpu_predict.py -input ./wiki_seq.txt -output ./test --att
-```
+We have updated the model and training a CPU model takes a long time. We Will release the CPU model soon. 
 
 #### Note
 The GPU model is trained using CuDNNLSTM, while the CPU model is trained using LSTM. So, the prediction results are slightly different between the two models. The results shown in the MULocDeep paper were obtained using the GPU model.
