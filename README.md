@@ -1,5 +1,5 @@
 # MULocDeep
-MULocDeep is a deep learning model for protein localization prediction at both sub-cellular level and sub-organellar level. It also has the ability to interpret localization mechanism at a amino acid resolution. Users can go to our webserver at xxx.xxx for localiztion prediction and visualization. This repository is for running MuLocDeep locally.
+MULocDeep is a deep learning model for protein localization prediction at both sub-cellular level and sub-organellar level. It also has the ability to interpret localization mechanism at a amino acid resolution. Users can go to our webserver at https://www.mu-loc.org/ for localiztion prediction and visualization. This repository is for running MuLocDeep locally.
 ## Installation
 
   - Installation has been tested in Windows, Linux and Mac OS X with Python 3.7.4. 
