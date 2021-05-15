@@ -31,6 +31,7 @@ Predicting protein localization using the pretrained model is fairly simple. The
 
 #### Example (using our provided example data): 
 
+
 For GPU usage:
 ```sh
 python predict.py -input ./wiki_seq.txt -output ./test --att
@@ -39,6 +40,7 @@ For CPU usage:
 We have updated the model and training a CPU model takes a long time. We Will release the CPU model soon. 
 
 #### Note
+The prediction result is given by the non-redundant model. This is for reproduction and method comparison using our non-redundant dataset (UniLoc_train_40nr). For better prediction performance, users could use our webserver at https://www.mu-loc.org/
 The GPU model is trained using CuDNNLSTM, while the CPU model is trained using LSTM. So, the prediction results are slightly different between the two models. The results shown in the MULocDeep paper were obtained using the GPU model.
 
 ## Contacts
