@@ -213,7 +213,7 @@ def main():
         if not outputdir[len(outputdir) - 1] == "/":
             outputdir = outputdir + "/"
         if not os.path.exists(outputdir):
-            os.mkdir(outputdir)
+            os.makedirs(outputdir)
         if existPSSM != "":
             if not existPSSM[len(existPSSM) - 1] == "/":
                 existPSSM = existPSSM + "/"
@@ -222,9 +222,11 @@ def main():
             pssmdir = outputdir + str(ts) + "_pssm/"
             if not os.path.exists(pssmdir):
                 os.makedirs(pssmdir)
-            process_input_train(input_lv1 + "lv1_train.txt", pssmdir)
-            process_input_train(input_lv2 + "lv2_train.txt", pssmdir)
             for foldnum in range(8):
+                process_input_train(input_lv1 + "lv1_train_fold" + str(foldnum) + "_seq", pssmdir)
+                process_input_train(input_lv1 + "lv1_val_fold" + str(foldnum) + "_seq", pssmdir)
+                process_input_train(input_lv2 + "lv2_train_fold" + str(foldnum) + "_seq", pssmdir)
+                process_input_train(input_lv2 + "lv2_val_fold" + str(foldnum) + "_seq", pssmdir)
                 train_MULocDeep(input_lv1, input_lv2, pssmdir, outputdir, foldnum)
         else:
             for foldnum in range(8):
@@ -235,7 +237,7 @@ def main():
         if not outputdir[len(outputdir) - 1] == "/":
             outputdir = outputdir + "/"
         if not os.path.exists(outputdir):
-            os.mkdir(outputdir)
+            os.makedirs(outputdir)
         if existPSSM != "":
             if not existPSSM[len(existPSSM) - 1] == "/":
                 existPSSM = existPSSM + "/"
@@ -244,8 +246,9 @@ def main():
             pssmdir = outputdir + str(ts) + "_pssm/"
             if not os.path.exists(pssmdir):
                 os.makedirs(pssmdir)
-            process_input_train(input_var + "processed_deeploc_train_S_seq", pssmdir)
             for foldnum in range(8):
+                process_input_train(input_var+"deeploc_40nr_train_fold" + str(foldnum) + "_seq", pssmdir)
+                process_input_train(input_var + "deeploc_40nr_var_fold" + str(foldnum) + "_seq", pssmdir)
                 train_var(input_var, pssmdir, outputdir, foldnum)
         else:
             for foldnum in range(8):
