@@ -114,7 +114,7 @@ def main():
     if not outputdir[len(outputdir) - 1] == "/":
         outputdir = outputdir + "/"
     if not os.path.exists(outputdir):
-        os.mkdir(outputdir)
+        os.makedirs(outputdir)
     existPSSM=args.existPSSM
     if existPSSM!="":
        if not existPSSM[len(existPSSM) - 1] == "/":
