@@ -34,10 +34,12 @@ Predicting protein localization using the pretrained model is fairly simple. The
 
 For GPU usage:
 ```sh
-python predict.py -input ./wiki_seq.txt -output ./test --att
+python predict.py -input ./wiki_seq.txt -output ./test --att --gpu
 ```
 For CPU usage:
-We have updated the model and training a CPU model takes a long time. We Will release the CPU model soon. 
+```sh
+python predict.py -input ./wiki_seq.txt -output ./test --att --cpu
+```
 
 #### Note
 The prediction result is given by the non-redundant model. This is for reproducibility and method comparison using our non-redundant dataset (UniLoc_train_40nr). For better prediction performance, users could use our webserver at https://www.mu-loc.org/
