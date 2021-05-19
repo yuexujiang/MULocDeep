@@ -255,6 +255,59 @@ def singlemodel(train_x):
     model_small.summary()
     return model_big, model_small
 
+def singlemodel_cpu(train_x):
+    [dim_lstm, da, r, W_regularizer, Att_regularizer_weight, drop_per, drop_hid, lr] = [
+        180, 369, 41, 0.00001,0.0007159, 0.1, 0.1, 0.0005]
+    input = Input(shape=(train_x.shape[1:]), name="Input")  # input's shape=[?,seq_len,encoding_dim]
+    input_mask = Input(shape=([train_x.shape[1], 1]), dtype='float32')  # (batch_size,max_len,1)
+    l_indrop = layers.Dropout(drop_per)(input)
+    mask_input = []
+    mask_input.append(l_indrop)
+    mask_input.append(input_mask)
+    mask_layer1 = Lambda(mask_func)(mask_input)
+    x1 = layers.Bidirectional(LSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
+                                        return_sequences=True), merge_mode='sum')(mask_layer1)  # [?,seq_len,dim_lstm]
+    x1bn = layers.BatchNormalization()(x1)
+    x1d = layers.Dropout(drop_hid)(x1bn)
+    mask_input = []
+    mask_input.append(x1d)
+    mask_input.append(input_mask)
+    mask_layer2 = Lambda(mask_func)(mask_input)
+    x2 = layers.Bidirectional(LSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
+                                        return_sequences=True), merge_mode='sum')(mask_layer2)  # [?,seq_len,dim_lstm]
+    x2bn = layers.BatchNormalization()(x2)
+    x2d = layers.Dropout(drop_hid)(x2bn)
+    mask_input = []
+    mask_input.append(x2d)
+    mask_input.append(input_mask)
+    mask_layer3 = Lambda(mask_func)(mask_input)
+    att = Attention(hidden=dim_lstm, da=da, r=r, init='glorot_uniform', activation='tanh',
+                    W1_regularizer=keras.regularizers.l2(W_regularizer),
+                    W2_regularizer=keras.regularizers.l2(W_regularizer),
+                    W1_constraint=None, W2_constraint=None, return_attention=True,
+                    attention_regularizer_weight=Att_regularizer_weight)(
+        layers.concatenate([mask_layer3, input_mask]))  # att=[?,r,dim_lstm]
+    attbn = layers.BatchNormalization()(att[0])
+    att_drop = layers.Dropout(drop_hid)(attbn)
+    flat = layers.Flatten()(att_drop)
+    flat_drop = layers.Dropout(drop_hid)(flat)
+    lev2_output = layers.Dense(units=10 * 8, kernel_initializer='orthogonal', activation=None)(flat_drop)
+    lev2_output_reshape = layers.Reshape([10, 8, 1])(lev2_output)
+    lev2_output_bn = layers.BatchNormalization()(lev2_output_reshape)
+    lev2_output_pre = layers.Activation('sigmoid')(lev2_output_bn)
+    lev2_output_act = layers.Reshape([10,8],name='lev2')(lev2_output_pre)
+    final = layers.MaxPooling2D(pool_size=[1, 8], strides=None, padding='same', data_format='channels_last')(
+        lev2_output_pre)
+    final = layers.Reshape([-1,],name='1ev1')(final)
+    model_small = Model(inputs=[input, input_mask], outputs=[lev2_output_act, final])
+    model_big = Model(inputs=[input, input_mask], outputs=[final])
+    adam = optimizers.Adam(lr=lr)
+    model_big.compile(optimizer=adam, loss='binary_crossentropy', metrics=['accuracy'])
+    model_small.compile(optimizer=adam, loss=['binary_crossentropy', 'binary_crossentropy'], metrics = ['accuracy'])
+    model_big.summary()
+    model_small.summary()
+    return model_big, model_small
+
 def process_input_train(seq_file,dir):
     processed_num=0
     if not os.path.exists(dir):
@@ -319,6 +372,53 @@ def var_model(train_x):
     mask_input.append(input_mask)
     mask_layer2 = Lambda(mask_func)(mask_input)
     x2 = layers.Bidirectional(CuDNNLSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
+                                       return_sequences=True), merge_mode='sum')(mask_layer2)  # [?,seq_len,dim_lstm]
+    x2bn = layers.BatchNormalization()(x2)
+    x2d = layers.Dropout(drop_hid)(x2bn)
+    mask_input = []
+    mask_input.append(x2d)
+    mask_input.append(input_mask)
+    mask_layer3 = Lambda(mask_func)(mask_input)
+
+    att = Attention(hidden=dim_lstm, da=da, r=r, init='glorot_uniform', activation='tanh',
+                    W1_regularizer=keras.regularizers.l2(W_regularizer),
+                    W2_regularizer=keras.regularizers.l2(W_regularizer),
+                    W1_constraint=None, W2_constraint=None, return_attention=True,
+                    attention_regularizer_weight=Att_regularizer_weight)(
+        layers.concatenate([mask_layer3, input_mask]))  # att=[?,r,dim_lstm]
+
+    attbn = layers.BatchNormalization()(att[0])
+    att_drop = layers.Dropout(drop_hid)(attbn)
+    flat = layers.Flatten()(att_drop)
+    flat_drop = layers.Dropout(drop_hid)(flat)
+    lev1_output = layers.Dense(units=10, kernel_initializer='orthogonal', activation=None)(flat_drop)
+    lev1_output_bn = layers.BatchNormalization()(lev1_output)
+    lev1_output_act = layers.Activation('softmax')(lev1_output_bn)
+    model = Model(inputs=[input, input_mask], outputs=lev1_output_act)
+    adam = optimizers.Adam(lr=lr)
+    model.compile(optimizer=adam, loss='categorical_crossentropy', metrics=['accuracy'])
+    return model
+
+def var_model_cpu(train_x):
+    [dim_lstm, da, r, W_regularizer, Att_regularizer_weight, drop_per, drop_hid, lr] = [
+        180, 369, 41, 0.00001,0.0007159, 0.1, 0.1, 0.0005]
+    input = Input(shape=(train_x.shape[1:]), name="Input")  # input's shape=[?,seq_len,encoding_dim]
+    input_mask = Input(shape=([train_x.shape[1], 1]), dtype='float32')  # (batch_size,max_len,1)
+    l_indrop = layers.Dropout(drop_per)(input)
+
+    mask_input = []
+    mask_input.append(l_indrop)
+    mask_input.append(input_mask)
+    mask_layer1 = Lambda(mask_func)(mask_input)
+    x1 = layers.Bidirectional(LSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
+                                       return_sequences=True), merge_mode='sum')(mask_layer1)  # [?,seq_len,dim_lstm]
+    x1bn = layers.BatchNormalization()(x1)
+    x1d = layers.Dropout(drop_hid)(x1bn)
+    mask_input = []
+    mask_input.append(x1d)
+    mask_input.append(input_mask)
+    mask_layer2 = Lambda(mask_func)(mask_input)
+    x2 = layers.Bidirectional(LSTM(dim_lstm, kernel_initializer="orthogonal", recurrent_initializer="orthogonal",
                                        return_sequences=True), merge_mode='sum')(mask_layer2)  # [?,seq_len,dim_lstm]
     x2bn = layers.BatchNormalization()(x2)
     x2d = layers.Dropout(drop_hid)(x2bn)
