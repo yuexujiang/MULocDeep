@@ -47,30 +47,29 @@ def process_eachseq(seq,pssmfile,mask_seq,new_pssms):
 
 
 def endpad(seqfile, pssmdir):
-        new_pssms = []
-        mask_seq = []
-        ids=[]
-        f = open(seqfile, "r")
-        index=0
-        for line in f:
+    new_pssms = []
+    mask_seq = []
+    ids = []
+    f = open(seqfile, "r")
+    index = 0
+    for line in f:
+        if ">" in line:
+            if index != 0:
+                ids.append(id)
+                process_eachseq(seq, pssmfile, mask_seq, new_pssms)
+
+            seq = ''
+            id = line.strip()[1:]
             pssmfile = pssmdir + str(index) + "_pssm.txt"
-            if ">" in line:
-                if index!=0:
-                   ids.append(id)
-                   process_eachseq(seq,pssmfile,mask_seq,new_pssms)
-                
-                seq=''
-                id = line.strip()[1:]
-            else:
-               seq+=line.strip()
-            
-            index+=1
-        
-        ids.append(id)
-        process_eachseq(seq,pssmfile,mask_seq,new_pssms)
-        x = np.array(new_pssms)
-        mask = np.array(mask_seq)
-        return [x, mask,ids]
+            index += 1
+        else:
+            seq += line.strip()
+
+    ids.append(id)
+    process_eachseq(seq, pssmfile, mask_seq, new_pssms)
+    x = np.array(new_pssms)
+    mask = np.array(mask_seq)
+    return [x, mask, ids]
 
 
 
@@ -106,9 +105,14 @@ def main():
                         help='Draw attention weight plot for each protein.', required=False)
     parser.add_argument('--no-att', dest='drawATT', action='store_false',
                         help='No attention weight plot.', required=False)
+    parser.add_argument('--gpu', dest='core', action='store_true',
+                        help='Use gpu for prediction.', required=False)
+    parser.add_argument('--cpu', dest='core', action='store_false',
+                        help='Use cpu for prediction.', required=False)
     parser.set_defaults(feature=True)
     args = parser.parse_args()
     att_draw=args.drawATT
+    core=args.core
     inputfile=args.inputfile
     outputdir=args.outputdir
     if not outputdir[len(outputdir) - 1] == "/":
@@ -135,7 +139,10 @@ def main():
     cross_pred_small = np.zeros((test_x.shape[0], 8, 10, 8))
 
     for foldnum in range(8):
-        model_big, model_small = singlemodel(test_x)
+        if core:
+            model_big, model_small = singlemodel(test_x)
+        else:
+            model_big, model_small = singlemodel_cpu(test_x)
         model_small.load_weights('./gpu_model_40nr/fold' + str(foldnum) + '_big_lv1_acc-weights.hdf5')
         
         cross_pred_small[:, foldnum]= model_small.predict([test_x, test_mask.reshape(-1, 1000, 1)])[0]
