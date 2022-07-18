@@ -46,7 +46,7 @@ The prediction result is given by the non-redundant model. This is for reproduci
 The GPU model is trained using CuDNNLSTM, while the CPU model is trained using LSTM. So, the prediction results are slightly different between the two models. The results shown in the MULocDeep paper were obtained using the GPU model.
 
 ## Contacts
-Our webserver/stand-along package are free of charge for academic users; other users are requested to contact the corresponding author of this work at
+Our webserver/stand-alone package are free of charge for academic users; other users are requested to contact the corresponding author of this work at
   - Email: xudong@missouri.edu
 
 If you ever have any question or problem using our tool, please contact us.
