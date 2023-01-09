@@ -44,24 +44,21 @@ def endpad(seqfile, labelfile, pssmdir="", npzfile = ""):
         f2 = open(labelfile, "r")
         index=0
         for line in f:
-            pssmfile = pssmdir + line[1:].strip() + "_pssm.txt"
+            
             if ">"in line:
-                 if index!=0:
-                   label = f2.readline().strip()
-                   labels.append(label)
-                   ids.append(id)
-                   process_eachseq(seq,pssmfile,mask_seq,new_pssms)
-                 
-                 seq=''
-                 id = line.strip()[1:]
+                if index!=0:
+                    process_eachseq(seq,pssmfile,mask_seq,new_pssms)
+                pssmfile = pssmdir + line[1:].strip() + "_pssm.txt"
+                label = f2.readline().strip()
+                labels.append(label)
+                seq=''
+                id = line.strip()[1:]
+                ids.append(id)
+                
             else:
                seq+=line.strip()
             
             index+=1
-        
-        label = f2.readline().strip()
-        labels.append(label)
-        ids.append(id)
         process_eachseq(seq,pssmfile,mask_seq,new_pssms)
         x = np.array(new_pssms)
         y = [convertlabels_to_categorical(i) for i in labels]
