@@ -45,8 +45,12 @@ python predict.py -input ./wiki_seq.txt -output ./test --att --cpu
   - The prediction result is given by the non-redundant model. This is for reproducibility and method comparison using our non-redundant dataset (UniLoc_train_40nr). For better prediction performance, users could use the model trained using the UniLoc_train dataset (this model and the corresponding predict code are in the "gpu_model_UniLoc_train" folder, the performance of this model is also claimed in the MULocDeep paper).
   - The GPU model is trained using CuDNNLSTM, while the CPU model is trained using LSTM. So, the prediction results are slightly different between the two models. The results shown in the MULocDeep paper were obtained using the GPU model.
   - Users are encoraged to use our webserver at https://www.mu-loc.org/ (the model used for the webserver will be updated regularly). The latest version now supports species-specific prediction. The performance is better than the general MULocDeep model when species information is known.
-The prediction result is given by the non-redundant model. This is for reproducibility and method comparison using our non-redundant dataset (UniLoc_train_40nr). For better prediction performance, users could use the model trained using the UniLoc_train dataset (this model and the corresponding predict code are in the "gpu_model_UniLoc_train" folder, the performance of this model is also claimed in the MULocDeep paper). Or, users are encoraged to use our webserver at https://www.mu-loc.org/ (the model used for the webserver will be updated regularly).
-The GPU model is trained using CuDNNLSTM, while the CPU model is trained using LSTM. So, the prediction results are slightly different between the two models. The results shown in the MULocDeep paper were obtained using the GPU model.
+
+##Citation
+MULocDeep web service for protein localization prediction and visualization at subcellular and suborganellar levels, Nucleic Acids Research, 2023, 10.1093/nar/gkad374
+MULocDeep: A deep-learning framework for protein subcellular and suborganellar localization prediction with residue-level interpretation, Computational and Structural Biotechnology Journal, Volume 19,
+2021, Pages 4825-4839, ISSN 2001-0370, https://doi.org/10.1016/j.csbj.2021.08.027.
+
 
 ## Contacts
 Our webserver/stand-alone package are free of charge for academic users; other users are requested to contact the corresponding author of this work at
